@@ -1,0 +1,106 @@
+<div class="alert alert-success text-center" data-ng-show="showSuccess" role="alert">
+    <button type="button" class="close" data-ng-click="showSuccess = false"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    {{successMessage}}
+</div>
+<div class="alert alert-danger text-center" data-ng-show="showFailure" role="alert">
+    <button type="button" class="close" data-ng-click="showFailure = false"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    {{ failureMessage }}
+</div>
+<h1 data-ng-show="$storage.isManager == 'true'">Balance: ${{ $storage.currentBalance }}</h1>
+<h4>Add Expense/Withdrawal</h4>
+<form class="form-inline" name="addExpenseForm" novalidate>
+    <div class="form-group">
+        <input type="text" placeholder="Description" class="form-control input-sm" data-ng-model="newExpense.description" required />
+    </div>
+    <div class="form-group">
+        <input type="text" placeholder="Expense Amount" class="form-control input-sm" data-ng-model="newExpense.amount" required />
+    </div>
+    <button class="btn btn-sm btn-danger" data-ng-click="addExpense()" data-ng-class="{ disabled: addExpenseForm.$error.required }" scroll-on-click>- Expense</button>
+</form><hr />
+<h4>Add Payment/Deposit</h4>
+<form class="form-inline" name="addPaymentForm" novalidate>
+    <div class="form-group">
+        <input type="text" placeholder="Description" class="form-control input-sm" data-ng-model="newPayment.description" required />
+    </div>
+    <div class="form-group">
+        <input type="text" placeholder="Payment Amount" class="form-control input-sm" data-ng-model="newPayment.amount" required />
+    </div>
+    <button class="btn btn-sm btn-success" data-ng-click="addPayment()" data-ng-class="{ disabled: addPaymentForm.$error.required }" scroll-on-click>+ Payment</button>
+</form><hr />
+<h4>Add Money Owed</h4>
+<form class="form-inline" name="addOwedForm" novalidate>
+    <div class="form-group">
+        <input type="text" placeholder="Description" class="form-control input-sm" data-ng-model="newOwed.description" required />
+    </div>
+    <div class="form-group">
+        <input type="text" placeholder="Payment Amount" class="form-control input-sm" data-ng-model="newOwed.amount" required />
+    </div>
+    <div class="form-group">
+        <input type="text" placeholder="To Whom" class="form-control input-sm" data-ng-model="newOwed.who" required />
+    </div>
+    <button class="btn btn-sm btn-info" data-ng-click="addOwed()" data-ng-class="{ disabled: addOwedForm.$error.required }" scroll-on-click>+ Money owed</button>
+</form>
+<div data-ng-show="$storage.owed.length || $storage.expenses.length">
+    <hr />
+    <input type="text" class="form-control" placeholder="Search..." data-ng-model="financeDesc" /><br />
+</div>
+
+<div data-ng-show="$storage.expenses.length">
+    <h4>Expenses/Payments</h4>
+    <table class="table table-striped table-condensed">
+        <thead>
+            <tr>
+                <th>Desc.</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="expense in $storage.expenses | filter: financeDesc | orderBy:'dateTime':true">
+                <td>{{ expense.desc }}</td>
+                <td>{{ expense.formattedDateTime }}</td>
+                <td>{{ expense.location }}</td>
+                <td>
+                    <div data-ng-if="expense.amount > 0">
+                        <font color="green">+{{ expense.amount }}</font>
+                    </div>
+                    <div data-ng-if="expense.amount < 0">
+                        <font color="red">{{ expense.amount }}</font>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+    
+<hr />
+
+<div data-ng-show="$storage.owed.length">
+    <hr />
+    <h4>Money Owed</h4>
+    <table class="table table-striped table-condensed">
+        <thead>
+            <tr>
+                <th>Desc.</th>
+                <th>Date</th>
+                <th>Who</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="owe in $storage.owed | filter: financeDesc | orderBy:'dateTime':true">
+                <td>{{ owe.desc }}</td>
+                <td>{{ owe.formattedDateTime }}</td>
+                <td>{{ owe.who }}</td>
+                <td>{{ owe.amount }} <button class="btn btn-sm btn-success" data-ng-click="payOwed(owe)" scroll-on-click>Pay back</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<br />
+<!--
+<button class="btn btn-danger" data-ng-click="clearFinances()">
+    Clear all expenses, owed, and balance
+</button>
+-->

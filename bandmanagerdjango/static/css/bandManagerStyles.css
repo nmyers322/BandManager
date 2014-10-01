@@ -1,0 +1,14 @@
+        body {
+            padding-top: 60px;
+        }
+        .homeScreenButton {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+		.navbar-fixed-top .navbar-collapse {
+			max-height: 500px;
+		}
+
+        .merchButton { 
+            margin: 5px;
+        }

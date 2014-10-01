@@ -1,0 +1,34 @@
+existing issues:
+shows "today view" isnt working
+ability to kick out band member
+merch: sell with square card reader
+merch: success sell: option to give discount
+user: forgot password/username
+ability to change username
+ability to change email
+ability to change password
+create "how to"
+fix drop down menu: close on outside click
+finances: addedBy
+delete band
+no apple/iphone/mac/safari support
+add show: delete time slots if added too many
+edit show
+integrate contacts library
+integrate venue library
+
+fixed/added:
+add Payment/"deposit"
+add expense/"withdrawal"
+move "change band"
+money owed: date formatted improperly
+money owed: success message is wrong
+finances: hide error/success on new action
+add show: let user know everything is optional
+make "change band name" obvious
+change band name: update menu bar
+(get rid of $broadcast/$on)
+update members (change info)
+make member email optional
+dont change your own member info!!
+add member: send invitation email (maybe fixed)

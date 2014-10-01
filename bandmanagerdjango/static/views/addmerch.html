@@ -1,0 +1,62 @@
+﻿<div class="row" id="addMerchContainer">
+    <div class="alert alert-success text-center" data-ng-show="showSuccess" role="alert">
+        <button type="button" class="close" data-ng-click="showSuccess = false"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        Your product {{success.name}} was added!
+    </div>
+    <div class="alert alert-danger text-center" data-ng-show="showFailure" role="alert">
+        <button type="button" class="close" data-ng-click="showFailure = false"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        {{ failureMessage }}
+    </div>
+    <h2 class="col-xs-offset-1">Add merch</h2>
+    <form class="form-horizontal" role="form" name="addMerchForm">
+        <div class="form-group col-xs-12">
+            <label for="name" class="col-sm-2 control-label">Name (required)</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="product.name" id="name" required>
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <h4 class="col-xs-offset-1"><strong>Options</strong></h4>
+            <div class="col-sm-10 col-xs-offset-1 panel panel-default" data-ng-repeat="(index, option) in options">
+                <div class="panel-body">
+                    <div data-ng-show="showDesc">
+                        <label for="desc" class="col-sm-2 control-label">Description</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="desc" class="form-control" placeholder="E.g. XL with white print" data-ng-model="option.description" /><br />
+                        </div>
+                    </div>
+                    <label for="price" class="col-sm-2 control-label">Price</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="price" class="form-control" placeholder="E.g. 10" data-ng-model="option.price" required/><br />
+                    </div>
+                    <label for="quantity" class="col-sm-2 control-label">Quantity in Stock</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="quantity" class="form-control" placeholder="E.g. 50" data-ng-model="option.quantity" required/><br />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-10 col-xs-offset-2">
+                <button type="button" class="btn btn-info" data-ng-click="addOption()">Add another product option</button>
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="notes" class="col-sm-2 control-label">Notes</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" data-ng-model="product.notes" id="notes">{{ newShow.notes }}</textarea>
+            </div>
+        </div>
+        <!--<div class="form-group col-xs-12">
+            <label for="image" class="col-sm-2 control-label">Product Image</label>
+            <div class="col-sm-10">
+                <input id="image" type="file" class="file" multiple="false" data-show-upload="false" data-show-caption="true" data-ng-model="image">
+            </div>
+        </div>-->
+        <div class="form-group col-xs-12">
+            <button type="button" class="btn btn-success col-xs-8 col-xs-offset-2" data-ng-click="addMerch()"
+                    data-ng-class="{ disabled: addMerchForm.$error.required }" scroll-on-click>
+                Add product
+            </button>
+        </div>
+
+    </form>
+</div>

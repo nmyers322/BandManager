@@ -1,0 +1,110 @@
+<div class="alert alert-success text-center" data-ng-show="showSuccess" role="alert">
+    <button type="button" class="close" data-ng-click="showSuccess = false"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    {{ successMessage }}
+</div>
+<h2 class="col-xs-offset-1">Merch</h2>
+<div class="panel-group" id="accordion" data-ng-repeat="(index, product) in $storage.merch"> <!-- | inStockProduct -->
+    <div class="panel panel-info">
+        <div class="panel-heading" data-ng-click="openAccordion(index)" style="cursor:pointer;">
+            <h4 class="panel-title">
+                
+                    {{product.name}}
+                
+            </h4>
+        </div>
+        <div data-ng-class="accordion[index]">
+
+            <div class="panel-body">
+                <div data-ng-if="ifProductOptions(product)">
+                    <div class="panel-group" id="innerAccordion" data-ng-repeat="(innerIndex, option) in product.options">
+                        <div class="panel panel-info">
+                            <div class="panel-heading" data-ng-click="openInnerAccordion(index,innerIndex)" style="cursor:pointer;">
+                                {{option.description}}
+                            </div>
+                            <div data-ng-class="innerAccordion[index][innerIndex]">
+                                <div class="panel-body">
+                                    <button class="btn btn-success btn-sm merchButton" data-ng-click="sellCash(product, option)" data-ng-show="inStock[index][innerIndex]" scroll-on-click><span class="glyphicon glyphicon-usd"></span> Sell (cash)</button>
+                                    <button class="btn btn-danger btn-sm merchButton" data-ng-click="trade(product, option)" data-ng-show="inStock[index][innerIndex]" scroll-on-click><span class="glyphicon glyphicon-heart"></span> Trade/Give away</button>
+                                    <button class="btn btn-primary btn-sm merchButton" data-ng-click="stats()"><span class="glyphicon glyphicon-info-sign"></span> Statistics</button>
+                                    <button class="btn btn-primary btn-sm merchButton" data-ng-click="options()" data-ng-show="$storage.isManager == 'true'"><span class="glyphicon glyphicon-cog"></span> Options</button>
+                                    <div data-ng-show="showStats" class="panel panel-body panel-info">
+                                        Price: {{option.price}}<br />
+                                        Number sold: {{option.numSold}}<br />
+                                        Totaling: ${{option.price * option.numSold}}<br />
+                                        Number traded/given away: {{option.numTraded}}<br />
+                                        Quantity remaining: {{option.quantity}}<br />
+                                        Notes: {{product.notes}}
+                                    </div>
+                                    <div data-ng-show="showOptions" class="panel panel-body panel-info">
+                                        <!-- delete item -->
+                                        <button data-ng-hide="showDeleteConfirm" class="btn btn-danger btn-sm merchButton" data-ng-click="deleteConfirm()"><span class="glyphicon glyphicon-remove"></span> Delete Item</button>
+                                        <div data-ng-show="showDeleteConfirm" class="panel panel-body panel-info">
+                                            Are you sure? 
+                                            <button class="btn btn-danger btn-sm merchButton" data-ng-click="deleteItem(index, innerIndex)" scroll-on-click><span class="glyphicon glyphicon-remove"></span>Yes, Delete Item</button>
+                                        </div>
+                                        <!-- add to stock -->
+                                        <button data-ng-hide="showAddToStockConfirm" class="btn btn-info btn-sm merchButton" data-ng-click="addToStockConfirm()"><span class="glyphicon glyphicon-plus"></span> Add to stock</button>
+                                        <div data-ng-show="showAddToStockConfirm" class="panel panel-body panel-info">
+                                            How many to add?
+                                            <input type="text" class="form-control merchButton addStockInput" placeholder="Enter amount" data-ng-model="add.toStock" data-ng-change="checkAddStock()">
+                                            <button class="btn btn-info btn-sm merchButton disabled" id="addStockButton" data-ng-click="addToStock(index, innerIndex)" scroll-on-click><span class="glyphicon glyphicon-plus"></span>Add</button>
+                                        </div>
+                                        <!-- change price of item -->
+                                        <button data-ng-hide="showChangePriceConfirm" class="btn btn-success btn-sm merchButton" data-ng-click="changePriceConfirm()"><span class="glyphicon glyphicon-pencil"></span> Change Price</button>
+                                        <div data-ng-show="showChangePriceConfirm" class="panel panel-body panel-info">
+                                            New Price: 
+                                            <input type="text" class="form-control merchButton newPriceInput" placeholder="Enter amount" data-ng-model="add.price" data-ng-change="checkPrice()">
+                                            <button class="btn btn-success btn-sm merchButton disabled" id="newPriceButton" data-ng-click="changePrice(index, innerIndex)" scroll-on-click><span class="glyphicon glyphicon-pencil"></span>Change</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div data-ng-if="!ifProductOptions(product)">
+                    <button class="btn btn-success btn-sm merchButton" data-ng-click="sellCash(product, null)" data-ng-show="inStock[index][0]" scroll-on-click><span class="glyphicon glyphicon-usd"></span> Sell (cash)</button>
+                    <button class="btn btn-danger btn-sm merchButton" data-ng-click="trade(product, null)" data-ng-show="inStock[index][0]" scroll-on-click><span class="glyphicon glyphicon-heart"></span> Trade/Give away</button>
+                    <button class="btn btn-primary btn-sm merchButton" data-ng-click="stats()"><span class="glyphicon glyphicon-info-sign"></span> Statistics</button>
+                    <button class="btn btn-primary btn-sm merchButton" data-ng-click="options()" data-ng-show="$storage.isManager == 'true'"><span class="glyphicon glyphicon-cog"></span> Options</button>
+                    <div data-ng-show="showStats" class="panel panel-body panel-info">
+                        Price: {{product.options[0].price}}<br />
+                        Number sold: {{product.options[0].numSold}}<br />
+                        Totaling: ${{product.options[0].price * product.options[0].numSold}}<br />
+                        Number traded/given away: {{product.options[0].numTraded}}<br />
+                        Quantity remaining: {{product.options[0].quantity}}<br />
+                        Notes: {{product.notes}}
+                    </div>
+                    <div data-ng-show="showOptions" class="panel panel-body panel-info">
+                        <!-- delete item -->
+                        <button data-ng-hide="showDeleteConfirm" class="btn btn-danger btn-sm merchButton" data-ng-click="deleteConfirm()"><span class="glyphicon glyphicon-remove"></span> Delete Item</button>
+                        <div data-ng-show="showDeleteConfirm" class="panel panel-body panel-info">
+                            Are you sure? 
+                            <button class="btn btn-danger btn-sm merchButton" data-ng-click="deleteItem(index, 0)" scroll-on-click><span class="glyphicon glyphicon-remove"></span>Yes, Delete Item</button>
+                        </div>
+                        <!-- add to stock -->
+                        <button data-ng-hide="showAddToStockConfirm" class="btn btn-info btn-sm merchButton" data-ng-click="addToStockConfirm()"><span class="glyphicon glyphicon-plus"></span> Add to stock</button>
+                        <div data-ng-show="showAddToStockConfirm" class="panel panel-body panel-info">
+                            How many to add?
+                            <input type="text" class="form-control merchButton addStockInput" placeholder="Enter amount" data-ng-model="add.toStock" data-ng-change="checkAddStock()"> 
+                            <button class="btn btn-info btn-sm merchButton disabled" id="addStockButton" data-ng-click="addToStock(index, 0)" scroll-on-click><span class="glyphicon glyphicon-plus"></span>Add</button>
+                        </div>
+                        <!-- change price of item -->
+                        <button data-ng-hide="showChangePriceConfirm" class="btn btn-success btn-sm merchButton" data-ng-click="changePriceConfirm()"><span class="glyphicon glyphicon-pencil"></span> Change Price</button>
+                        <div data-ng-show="showChangePriceConfirm" class="panel panel-body panel-info">
+                            New Price: 
+                            <input type="text" class="form-control merchButton" id="newPriceInput" placeholder="Enter amount" data-ng-model="add.price" data-ng-change="checkPrice()">
+                            <button class="btn btn-success btn-sm merchButton disabled" id="newPriceButton" data-ng-click="changePrice(index, 0)" scroll-on-click><span class="glyphicon glyphicon-pencil"></span>Change</button>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+
+        </div>
+    </div>
+</div>
+<hr />
+<div data-ng-class="homeScreenButtonClass" data-ng-show="$storage.isManager == 'true'">
+    <button class="btn btn-lg btn-info btn-block" data-ng-click="go('addmerch')"><span class="glyphicon glyphicon-pencil"></span> Add new merch item</button>
+</div>

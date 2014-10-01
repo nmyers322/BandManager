@@ -1,0 +1,430 @@
+{% load staticfiles %}
+<!-- BandManagerDjango App written by Nathanial Myers 2014 -->
+<!-- This app is released under the GPL. -->
+<!-- This part of the app is used for member sign up and data entry, as well as the REST API -->
+
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" data-ng-app="BandManagerApp">
+<head>
+    <meta charset="utf-8" />
+    <!-- Using the Darkly theme from Bootswatch -->
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet" />
+    <!--Custom style-->
+    <style>
+        .hiddenAlert {
+            display: none !important;
+            visibility: hidden !important;
+        }
+    </style>
+    <title>BandManager (beta)</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body role="document" style="margin-top:70px;">
+    <div class="container">
+        <!-- Fixed navbar -->
+        <div class="navbar-outer">
+            <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">BandManager (beta)</a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        {% if show_sign_in == True %}
+                        {% for band in bandList %}
+                            <li><a class="clickCollapse" href="{% url 'app' band.id %}">{{band.name}}</a></li>
+                        {% endfor %}
+                        <li><a class="clickCollapse" href="#newBand" id="newBandLink">+ New Band</a></li>
+                        <li><a class="clickCollapse" href="{% url 'logout' %}">Log out</a></li>
+                    </ul>
+                        {% else %}
+                        <li><a class="clickCollapse" href="#features">Features</a></li>
+                        <li><a class="clickCollapse" href="#register">Register</a></li>
+                        <li><a class="clickCollapse" href="#signin">Sign in</a></li>
+                        <li><a class="clickCollapse" href="#knownissues">Known issues/Notes</a></li>
+                    </ul>
+                    <form class="navbar-form navbar-right" role="form" action="login" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="text" placeholder="Username" class="form-control" name="username" id="username">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" placeholder="Password" class="form-control" name="password" id="password">
+                        </div>
+                        <button type="submit" class="btn btn-success">Sign in</button>
+                    </form>
+                    {% endif %}
+                </div><!--/.nav-collapse -->
+            </div>
+        </div>
+    
+        <!--Error messages-->
+        {% if error != "" %}
+        <div class="alert alert-danger" id="loginAlert">
+            <button type="button" class="close" id="closeLoginAlert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            {{ error }}
+        </div>
+        {% endif %}
+    
+        <!--Content Goes Here-->
+        {% if show_sign_in == False %}
+        <div class="jumbotron" style="border-radius:10px;">
+            <h2>BandManager makes touring easier.</h2>
+            <ul>
+                <li>Easily keep track of your finances, tour schedule, set times, and merch sales/trades. </li>
+                <li>Share it with your band members so they never have to wonder what's going on. </li>
+                <li>Built-in buttons for easy contact with your band-mates/promoters and Google maps navigation. </li>
+                <li>Secure log-in is for band members only. </li>
+                <li>Only the band manager(s) can add/remove members, change show info, update merch, and view the band fund's balance.</li>
+                <li><a href="#register">Sign up free!</a></li>
+            </ul>
+            <div id="features"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel panel-heading"><h2>Features</h2></div>
+            <div class="panel panel-body">
+                
+                <div class="col-md-9">
+                    <strong>Merch</strong> takes care of logging your merch sales. When you're at a show, no one wants to open the notebook and write down the XL black logo shirt you just sold. Just click a button and the payment amount is added to your band's balance. <hr />
+                    <strong>Finances</strong> helps you stay on top of expenses and payments. Did one of your band members front the money to buy bulk records or some beer for later? No problem, just add it to Money Owed and pay it back when you have it in the band fund.<hr />
+                    <strong>Shows</strong> lists all of your tour dates, starting with the one tonight. Easily tap a button to navigate you to the show or call/text the promoter. Now there's no excuse from band-mates about load in time or when you're playing -- it's on the itinerary.<hr />
+                    <strong>Members</strong> gathers all of your band-mates' contact info into one section where you can easily call/text eachother. <br>
+                </div>
+                <div class="col-md-3">
+                    <img src="{% static "img/expenses-preview.jpg" %}">
+                </div>
+            </div>
+            <div id="register"></div>
+        </div>
+
+        
+        <div class="panel">
+            <div class="panel panel-heading"><h2>Register</h2></div>
+            <div class="panel panel-body">
+
+                <form method="POST" action="register" class="form-horizontal col-md-10 col-md-offset-1" name="registerForm" id="registerForm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="desiredUsername">Desired Username</label>
+                        <input class="form-control" type="text" name="desiredUsername" id="desiredUsername" placeholder="Username">
+                    </div>
+                    <div class="alert alert-danger hiddenAlert" id="usernameTakenAlert">The desired username is taken!</div>
+                    <div class="alert alert-danger hiddenAlert" id="usernameInvalidAlert">The desired username is not valid! Use only letters, numbers, and the following characters: . + _ -</div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input class="form-control" type="email" name="registerEmail" id="registerEmail" placeholder="Example@example.com">
+                    </div>
+                    <div class="alert alert-info hiddenAlert" id="emailInvalidAlert">Remember: Your email must be in the form of example@example.com</div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input class="form-control" type="password" name="registerPassword" id="registerPassword">
+                    </div>
+                    <div class="alert alert-info hiddenAlert" id="passwordInvalidAlert">Your password must be at least 4 characters long.</div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Repeat Password</label>
+                        <input class="form-control" type="password" name="confirmPassword" id="confirmPassword">
+                    </div>
+                    <div class="alert alert-info hiddenAlert" id="confirmPasswordAlert">The two passwords must match.</div>
+                    <div class="form-group">
+                        <label for="firstName">Your First Name (Optional)</label>
+                        <input class="form-control" type="text" name="firstName" id="firstName" placeholder="E.g. Carrey">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Your Last Name (Optional)</label>
+                        <input class="form-control" type="text" name="lastName" id="lastName" placeholder="E.g. Kyng">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary btn-md col-md-offset-2 disabled" type="submit" id="registerSubmit">Submit</button>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+    
+    <div id="signin"></div>
+    <div class="panel">
+        <div class="panel panel-heading"><h2>Sign in</h2></div>
+        <div class="panel panel-body">
+            <form method="POST" action="login" class="form-horizontal col-md-10 col-md-offset-1" name="loginForm2" id="loginForm2">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input class="form-control" type="text" name="username" id="username" placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <label for="username">Password</label>
+                    <input class="form-control" type="password" name="password" id="password">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-md col-md-offset-2" type="submit">Sign in</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="knownissues"></div>
+    <div class="panel">
+        <div class="panel panel-heading"><h2>Known Issues/Notes</h2></div>
+        <div class="panel panel-body">
+            <p>This app is still in beta mode, and hasn't been extensively tested. There are still many known features that must be added and problems that must be fixed. Below is a list of the known issues.</p>
+            <p>shows "today view" isnt working, ability to kick out band member, merch: sell with square card reader, merch: success sell: option to give discount, user: forgot password/username, ability to change username, ability to change email, ability to change password, create "how to", fix drop down menu: close on outside click, finances: addedBy, delete band, no apple/iphone/mac/safari support, add show: delete time slots if added too many, edit show</p>
+        </div>
+    </div>
+        {% else %}
+
+        {% if invList %}
+        <div class="panel" id="invitations">
+            <div class="panel panel-heading"><h2>Invitations</h2></div>
+            <div class="panel panel-body">
+                <h4>You've been invited to join a band!</h4>
+            {% for inv in invList %}
+            <div style="padding:10px;">
+                <a class="btn btn-lg btn-info btn-block" href="{% url 'joinBand' inv.id %}">
+                     <span class="glyphicon glyphicon-plus"></span> Join {{inv.name}}</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="panel">
+            <div class="panel panel-heading"><h2>{{ username }}'s Bands</h2></div>
+            <div class="panel panel-body">
+                {% for band in bandList %}
+                <div style="padding:10px;">
+                    <a class="btn btn-lg btn-info btn-block" href="{% url 'app' band.id %}">
+                         <span class="glyphicon glyphicon-circle-arrow-right"></span> {{band.name}}</a>
+                </div>
+                {% endfor %}
+                <hr />
+                <a class="btn btn-lg btn-info btn-block" id="newBandButton" href="#newBand">
+                    <span class="glyphicon glyphicon-plus-sign"></span> New Band</a>
+                <hr />
+                <a class="btn btn-lg btn-info btn-block" id="logoutButton" href="{% url 'logout' %}">
+                    <span class="glyphicon glyphicon-share-alt"></span> Log out</a>
+            </div>
+            <div id="newBand"></div>
+        </div>
+
+        <div id="newBandPanel" class="panel hiddenAlert">
+            <div class="panel panel-heading"><h2>New Band</h2></div>
+            <div class="panel panel-body">
+                <form method="POST" action="newBand" class="form-horizontal col-md-10 col-md-offset-1" name="newBandForm" id="newBandForm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="bandName">Band Name</label>
+                        <input class="form-control" type="text" name="bandName" id="bandName" placeholder="E.g. The Losers">
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber">Your Phone Number (Optional)</label>
+                        <input class="form-control" type="text" name="phoneNumber" id="phoneNumber" placeholder="E.g. 206 420 6669">
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Your Role (Optional)</label>
+                        <input class="form-control" type="text" name="role" id="role" placeholder="E.g. Guitar">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary btn-md col-md-offset-2 disabled" type="submit" id="createBandButton">Create Band</button>
+                    </div>
+            </div>
+        </div>
+
+        {% endif %}
+   
+    <div id="footer" class="panel">
+        <div class="panel panel-body text-center">
+            BandManager is copyright 2014 by Nathanial Myers. <br />
+            Contact me: nmyers322 at gmail dot com. 
+        </div>
+    </div>
+    
+
+    <!-- jQuery main source-->
+    <script src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    <!--Bootstrap scripts-->
+    <script src="{% static "js/bootstrap.min.js" %}"></script>
+    <!--Registration form custom script-->
+    <script>
+        $(document).ready(function(){
+            //-----------------------------------------------------------------------------------------------------
+            //this indented block was from a post on stack overflow about the CSRF django token working with ajax
+                 $(document).ajaxSend(function(event, xhr, settings) {
+                    function getCookie(name) {
+                      var cookieValue = null;
+                      if (document.cookie && document.cookie != '') {
+                       var cookies = document.cookie.split(';');
+                       for (var i = 0; i < cookies.length; i++) {
+                          var cookie = jQuery.trim(cookies[i]);
+                          // Does this cookie string begin with the name we want?
+                          if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                          }
+                       }
+                      }
+                      return cookieValue;
+                    }
+                  function sameOrigin(url) {
+                      // url could be relative or scheme relative or absolute
+                      var host = document.location.host; // host + port
+                      var protocol = document.location.protocol;
+                      var sr_origin = '//' + host;
+                      var origin = protocol + sr_origin;
+                      // Allow absolute or scheme relative URLs to same origin
+                      return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+                      (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+                      // or any other URL that isn't scheme relative or absolute i.e relative.
+                      !(/^(\/\/|http:|https:).*/.test(url));
+                  }
+                  function safeMethod(method) {
+                      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+                  }
+
+                  if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+                      xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                  }
+                  });
+            //-----------------------------------------------------------------------------------------------------
+
+            //these will help me track when to enable the submit button
+            var desiredUsernameValid = false;
+            var registerEmailValid = false;
+            var registerPasswordValid = false;
+            var confirmPasswordValid = false;
+
+            //function to check if username is valid
+            function IsValidUsername(username) {
+                var regex = /^([a-zA-Z0-9_.+-])+$/;
+                return regex.test(username);
+            }
+            //check the username
+            $('#desiredUsername').blur(function () {
+                //check for validity
+                if(IsValidUsername($('#desiredUsername').val())){
+                    //check if username exists
+                    var username = $('#desiredUsername').val();
+                    var encapData = { username: username }
+                    var args = { 
+                        type:"POST", 
+                        url:"{% url 'checkIfUsernameExists' %}", 
+                        data:encapData, 
+                        cache:false
+                    }; 
+                    var jqXHR = $.ajax(args);
+                    jqXHR.done(function(msg){
+                        if(jqXHR.responseText == "true"){
+                            //the username is taken!!
+                            $('#usernameTakenAlert').removeClass('hiddenAlert');
+                            desiredUsernameValid = false;
+                        } else {
+                            //the username is valid and not taken.
+                            desiredUsernameValid = true;
+                        }
+                    });
+                } else {
+                    //username not valid
+                    if($('#desiredUsername').val() != ''){
+                        $('#usernameInvalidAlert').removeClass('hiddenAlert');
+                    }
+                    desiredUsernameValid = false;
+                }
+                
+            });
+            $('#desiredUsername').focus(function () {
+                $('#usernameTakenAlert').addClass('hiddenAlert');
+                $('#usernameInvalidAlert').addClass('hiddenAlert');
+
+            });
+            //function to check if email is valid
+            function IsEmail(email) {
+                var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                return regex.test(email);
+            }
+            //check if its a valid email (yes, you can use the same email for multiple users)
+            $('#registerEmail').on('input', function () {
+                if(!IsEmail($('#registerEmail').val())){
+                    //not an email
+                    $('#emailInvalidAlert').removeClass('hiddenAlert');
+                    registerEmailValid = false;
+                } else {
+                    //email is valid
+                    registerEmailValid = true;
+                    $('#emailInvalidAlert').addClass('hiddenAlert');
+                }
+            });
+            //check if password is valid
+            $('#registerPassword').on('input', function () {
+                if($('#registerPassword').val().length < 4){
+                    //password is less than 4 long. 
+                    $('#passwordInvalidAlert').removeClass('hiddenAlert');
+                    registerPasswordValid = false;
+                } else {
+                    registerPasswordValid = true;
+                    $('#passwordInvalidAlert').addClass('hiddenAlert');
+                }
+            });
+            //check if both passwords match
+            $('#confirmPassword').on('input', function () {
+                var p1 = $('#registerPassword').val();
+                var p2 = $('#confirmPassword').val();
+                if(p1 != p2){
+                    $('#confirmPasswordAlert').removeClass('hiddenAlert');
+                    confirmPasswordValid = false;
+                } else {
+                    confirmPasswordValid = true;
+                    $('#confirmPasswordAlert').addClass('hiddenAlert');
+                }
+            });
+            //continuously check if everything's valid
+            setInterval( function () {
+                if(desiredUsernameValid == true 
+                    && registerEmailValid == true 
+                    && registerPasswordValid == true 
+                    && confirmPasswordValid == true){
+                    $('#registerSubmit').removeClass('disabled');
+                } else {
+                    $('#registerSubmit').addClass('disabled');
+                }
+                //new band form
+                if($('#bandName').val() != ''){
+                    $('#createBandButton').removeClass('disabled');
+                } else {
+                    $('#createBandButton').addClass('disabled');
+                }
+            }, 50);
+
+            //reveal the new band panel
+            $('#newBandButton').click(function () {
+                $('#newBandPanel').removeClass('hiddenAlert');
+            });
+            $('#newBandLink').click(function () {
+                $('#newBandPanel').removeClass('hiddenAlert');
+            });
+
+            //close the login alert
+            $('#closeLoginAlert').click( function () {
+                $('#loginAlert').addClass('hiddenAlert');
+            });
+        });
+        
+        //hack to fix the non-collapsing menu on menu item click
+        $(document).ready(function () {
+            
+            $(".clickCollapse").click(function (event) {
+                //bootstrap collapses the menubar at 768 pixels by default
+                if($(window).width() <= 768){
+                    $(".navbar-collapse").collapse('hide');
+                }
+            });
+
+        });
+    
+    </script>
+
+</body>
+</html>

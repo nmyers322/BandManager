@@ -1,0 +1,150 @@
+<div class="row" id="addShowContainer">
+    <div class="alert alert-success text-center" data-ng-show="showSuccess" role="alert">
+        <button type="button" class="close" data-ng-click="showSuccess = false"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        Show on {{success.dateOfShow}} at {{success.venue}} was added!
+    </div>
+    <div class="alert alert-danger text-center" data-ng-show="showFailure" role="alert">
+        <button type="button" class="close" data-ng-click="showFailure = false"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        {{ failureMessage}}
+    </div>
+<h2 class="col-xs-offset-1">Add show</h2>
+<h4 class="col-xs-offset-2">(Everything below is optional except the date of the show)</h4>
+    <form class="form-horizontal" role="form" name="addShowForm" novalidate>
+        <div class="form-group col-xs-12">
+            <label for="date" class="col-sm-2 control-label">Date (required)</label>
+            <div class="col-sm-10">
+                <input type="date" placeholder="yyyy-MM-dd" class="form-control" data-ng-model="newShow.dateOfShow" id="date" name="date" required><br />
+                <div class="error" data-ng-show="addShowForm.date.$error.required">
+                    <div class="alert alert-danger text-center" role="alert">Date is required to add a show</div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="venue" class="col-sm-2 control-label">Venue</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="venue" data-ng-model="newShow.venue" placeholder="E.g. Highline">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="address" class="col-sm-2 control-label">Street Address</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="address" data-ng-model="newShow.address" placeholder="E.g. 210 Broadway Ave. E.">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="cityState" class="col-sm-2 control-label">City, State</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="cityState" data-ng-model="newShow.cityState" placeholder="E.g. Seattle, WA">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="cost" class="col-sm-2 control-label">Door cost</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="newShow.cost" id="cost" placeholder="E.g. 12 door / 15 advance">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="promoter" class="col-sm-2 control-label">Promoter</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="newShow.promoter" id="promoter" placeholder="E.g. Dylan">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="promoterEmail" class="col-sm-2 control-label">Promoter Email</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="newShow.promoterEmail" id="promoterEmail" placeholder="E.g. promoter@somewhere.com">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="promoterPhone" class="col-sm-2 control-label">Promoter Phone Number</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="newShow.promoterPhone" id="promoterPhone" placeholder="E.g. 2065556969">
+            </div>
+        </div>
+        <div class="form-group col-xs-12" data-ng-class="{'has-error': timepickerForm.time.$invalid}">
+            <h4 class="col-xs-offset-1"><strong>Schedule</strong></h4>
+                <div class="col-sm-10 col-xs-offset-1 panel panel-default" data-ng-repeat="(index, scheduleItem) in scheduleItems">
+                    <div class="panel-body">{{index+1}}:<br />
+                        <label for="time" class="col-sm-2 control-label">Time (default PM)</label>
+                        <div class="col-sm-10">
+                            <ng-form name="time">
+                                <input type="time" data-ng-model="scheduleItem.time" class="form-control" required />
+                                <br />
+                            </ng-form>
+                            <div class="error" data-ng-show="time.$error.required">
+                                <div class="alert alert-danger text-center" role="alert">Time is required</div>
+                            </div>
+                        </div>
+                        <label for="desc" class="col-sm-2 control-label">Description</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="desc" class="form-control" data-ng-change="changeShowWebSite(index)" placeholder="{{scheduleItem.itemPlaceHolderDesc}}" data-ng-model="scheduleItem.description" /><br />
+                        </div>
+                        <div data-ng-show="scheduleItem.showWebSite">
+                            <label for="website" class="col-sm-2 control-label">Website (optional)</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="website" class="form-control" placeholder="{{scheduleItem.itemPlaceHolderWebsite}}" data-ng-model="scheduleItem.website" /><hr />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <div class="col-sm-10 col-xs-offset-2">
+                <button type="button" class="btn btn-info" data-ng-click="addScheduleItem()">Add slot to schedule</button>
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="drinks" class="col-sm-2 control-label">Drinks</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="newShow.drinks" id="drinks" placeholder="E.g. 2 each">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="meals" class="col-sm-2 control-label">Meals provided</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="newShow.meals" id="meals" placeholder="E.g. Burritos">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="guarantee" class="col-sm-2 control-label">Guarantee</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="newShow.guarantee" id="guarantee" placeholder="E.g. 650">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="parking" class="col-sm-2 control-label">Parking Availability</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="newShow.parking" id="parking" placeholder="E.g. Under the building">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="lodging" class="col-sm-2 control-label">Lodging</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="newShow.lodging" id="lodging" placeholder="E.g. Nate's House">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="lodgingAddress" class="col-sm-2 control-label">Lodging Street Address</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-ng-model="newShow.lodgingAddress" id="lodgingAddress" placeholder="E.g. 1200 Beacon Ave. S.">
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="guestList" class="col-sm-2 control-label">Guest List</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" data-ng-model="newShow.guestList" id="guestList">{{ newShow.guestList }}</textarea>
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <label for="notes" class="col-sm-2 control-label">Notes to Band Members</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" data-ng-model="newShow.notes" id="notes">{{ newShow.notes }}</textarea>
+            </div>
+        </div>
+        <div class="form-group col-xs-12">
+            <button type="button" class="btn btn-success col-xs-8 col-xs-offset-2" data-ng-click="addShow()"
+                    data-ng-class="{ disabled: addShowForm.$error.required }" scroll-on-click>
+                Add show
+            </button>
+        </div>
+
+    </form>   
+</div>

@@ -1,0 +1,79 @@
+<h2 class="col-xs-offset-1">Shows</h2>
+<div data-ng-hide="showAllButton">
+    <button class="btn btn-info btn-sm col-xs-offset-1" data-ng-click="showAll(false)">Displaying all shows</button><br /><br />
+    <input type="text" class="form-control" data-ng-model="searchShows" placeholder="Search..." /><br />
+    </div>
+<div data-ng-show="showAllButton"><button class="btn btn-info btn-sm col-xs-offset-1" data-ng-click="showAll(true)">Displaying today and future shows</button><br /><br /></div>
+<div data-ng-repeat="show in $storage.shows|filter: searchShows|dateFilter:category|orderBy:'dateOfShow':false" class="row panel panel-info">
+
+    <table class="table">
+        <thead>
+            <tr class="panel-heading">
+                <th class="col-xs-3">Date</th>
+                <th>{{show.dateOfShow | formatDate}} </th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--<tr>
+                <td></td>
+                <td><button class="btn btn-xs col-xs-offset-1 btn-danger" data-ng-click="deleteShow(show)"><span class="glyphicon glyphicon-remove"></span> Delete show</button></td>
+            </tr>-->
+            <tr data-ng-show="show.venue != null">
+                <td>Venue</td>
+                <td>{{show.venue}}</td>
+            </tr>
+            <tr data-ng-show="show.address != null">
+                <td>Address</td>
+                <td>{{show.address}}<br />{{show.cityState}}<br /><button data-ng-click="mapsUrl(show.address, show.cityState)" class="btn btn-sm btn-info" role="button"><span class="glyphicon glyphicon-road"></span> Directions</button></td>
+            </tr>
+            <tr data-ng-show="show.cost != null">
+                <td>Door cost</td>
+                <td>{{show.cost}}</td>
+            </tr>
+            <tr data-ng-show="show.promoter != null || show.promoterEmail != null || show.promoterPhone != null">
+                <td>Promoter</td>
+                <td>
+                    {{show.promoter}}<br />
+                    <button class="btn btn-sm btn-info" data-ng-click="email(show.promoterEmail)" data-ng-show="show.promoterEmail != null"><span class="glyphicon glyphicon-send"></span> {{show.promoterEmail}}</button><br /><br />
+                    <button class="btn btn-sm btn-info" data-ng-click="call(show.promoterPhone)" data-ng-show="show.promoterPhone != null"><span class="glyphicon glyphicon-phone-alt"></span> {{show.promoterPhone}}</button>
+                </td>
+            </tr>
+            <tr data-ng-show="show.scheduleItems.length != 0">
+                <td>Schedule</td>
+                <td>
+                    <table class="table" data-ng-repeat="sched in show.scheduleItems|orderBy:'time'">
+                        <tr>
+                            <td class="col-xs-1">{{sched.time | formatTime}}</td>
+                            <td data-ng-show="sched.website != null"><a data-ng-href="http://{{sched.website}}">{{sched.description}}</a></td>
+                            <td data-ng-hide="sched.website != null">{{sched.description}}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr data-ng-show="show.parking != null">
+                <td>Parking Availability</td>
+                <td>{{show.parking}}</td>
+            </tr>
+            <tr data-ng-show="show.notes != null">
+                <td>Notes</td>
+                <td>{{show.notes}}</td>
+            </tr>
+            <tr data-ng-show="show.guestList != null">
+                <td>Guest List</td>
+                <td>{{show.guestList}}</td>
+            </tr>
+            <tr data-ng-show="show.drinks != null || show.meals != null">
+                <td>Drinks / Meals</td>
+                <td>{{show.drinks}}<br />{{show.meals}}</td>
+            </tr>
+            <tr data-ng-show="show.lodging != null || show.lodgingAddress != null">
+                <td>Lodging</td>
+                <td>{{show.lodging}}<br />{{show.lodgingAddress}}<br /><button data-ng-click="mapsUrl(show.lodgingAddress, show.cityState)" class="btn btn-sm btn-info" data-ng-show="show.lodgingAddress != null"><span class="glyphicon glyphicon-road"></span> Directions</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+<div data-ng-class="homeScreenButtonClass" data-ng-show="$storage.isManager == 'true'">
+    <button class="btn btn-lg btn-info btn-block" data-ng-click="go('addshow')"><span class="glyphicon glyphicon-plane"></span> Add new show</button>
+</div>

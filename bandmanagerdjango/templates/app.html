@@ -1,0 +1,102 @@
+﻿{% load staticfiles %}
+
+<!-- BandManager App written by Nathanial Myers 2014 -->
+<!-- This app is released under the GPL. -->
+<!-- It can be used to manage a band including finances, band members, and schedules. -->
+
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" data-ng-app="BandManagerApp">
+<head>
+    <meta charset="utf-8" />
+    <!-- Using the Darkly theme from Bootswatch -->
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet" />
+    <!-- BandManagerApp custom styles-->
+    <link href="{% static "css/bandManagerStyles.css" %}" rel="stylesheet" />
+    <title>BandManager (beta)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/> 
+</head>
+{% verbatim %}
+<body role="document" data-ng-controller="ApplicationController">
+    <div class="container">
+        <!-- Fixed navbar -->
+        <div class="navbar-outer">
+            <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand clickCollapse" href="#/">BandManager (beta)</a>
+                </div>
+                <div class="navbar-collapse collapse" data-ng-controller="HeaderController">
+                    <ul class="nav navbar-nav">
+                        <li data-ng-class="{ active: isActive('/') }"><a class="clickCollapse" href="#/">
+                            {{ $storage.bandName }}
+                        </a></li>
+                        <li data-ng-class="{ active: isActive('/itinerary') }"><a class="clickCollapse" href="#/itinerary">Shows</a></li>
+                        <li data-ng-class="{ active: isActive('/merch') }"><a class="clickCollapse" href="#/merch">Merch</a></li>
+                        <li data-ng-class="{ active: isActive('/finances') }"><a class="clickCollapse" href="#/finances">Finances</a></li>
+                        <li data-ng-class="{ active: isActive('/members') }"><a class="clickCollapse" href="#/members">Members</a></li>
+
+                        <li class="dropdown" data-ng-show="$storage.isManager == 'true'">
+                            <a class="dropdown-toggle" data-toggle="dropdown" style="cursor:pointer;">Manage<span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li data-ng-class="{ active: isActive('/addshow') }"><a class="clickCollapse" href="#/addshow">Add Shows</a></li>
+                                <li data-ng-class="{ active: isActive('/manageband') }"><a class="clickCollapse" href="#/manageband">Band/Members</a></li>
+                                <li data-ng-class="{ active: isActive('/addmerch') }"><a class="clickCollapse" href="#/addmerch">Add Merch</a></li>
+                            </ul>
+                        </li>
+                        {% endverbatim %}
+                        <li><a href="/">{{ username }}</a></li>
+                        {% verbatim %}
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div data-ng-view="">
+            <!-- Placeholder for views-->
+        </div>
+    </div>
+
+{% endverbatim %}
+    <!--Angular main source-->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.js"></script>
+
+    <!--<script src="{% static "js/angular.min.js" %}"></script>-->
+    <!--Additional angular packages-->
+    <script src="{% static "js/angular-route.min.js" %}"></script>
+    <script src="{% static "js/angular-animate.min.js" %}"></script>
+    <!--Used for local storage of data-->
+    <script src="{% static "js/ngStorage.min.js" %}"></script>
+    <!--Used for REST data from server-->
+    <script src="{% static "js/angular-resource.min.js" %}"></script>
+    <!-- jQuery main source-->
+    <script src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    <!--Bootstrap scripts-->
+    <script src="{% static "js/bootstrap.min.js" %}"></script>
+    <!--BandManagerApp main source-->
+    <script src="{% static "js/bandManagerApp.js" %}"></script>
+    <!--BandManagerApp controllers split into seperate files-->
+    <script src="{% static "js/controllers/addMerch.js" %}"></script>
+    <script src="{% static "js/controllers/addShow.js" %}"></script>
+    <script src="{% static "js/controllers/application.js" %}"></script>
+    <script src="{% static "js/controllers/finances.js" %}"></script>
+    <script src="{% static "js/controllers/header.js" %}"></script>
+    <script src="{% static "js/controllers/home.js" %}"></script>
+    <script src="{% static "js/controllers/itinerary.js" %}"></script>
+    <script src="{% static "js/controllers/manageBand.js" %}"></script>
+    <script src="{% static "js/controllers/members.js" %}"></script>
+    <script src="{% static "js/controllers/merch.js" %}"></script>
+
+    <!--current location script-->
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
+    
+
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<div class="row col-xs-12">
+    <div class="alert alert-success text-center" data-ng-show="showSuccess" role="alert">
+        <button type="button" class="close" data-ng-click="showSuccess = false"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        Member data updated successfully.
+    </div>
+    <div class="panel panel-info" data-ng-repeat="(index, member) in $storage.members | orderBy: 'status'">
+
+        
+            <div class="panel-header" style="padding:10px;">
+                <strong>{{member.name}}</strong>
+            </div>
+            <div class="panel-body">
+                <div data-ng-hide="editMemberPanel[index]">
+                    <table class="table">
+                        <tr>
+                            <td>Role</td>
+                            <td>{{member.role}}</td>
+                        </tr>
+                        
+                        <tr data-ng-show="member.phone != ''">
+                            <td>Phone</td>
+                            <td><button class="btn btn-sm btn-info" data-ng-click="call(member.phone)" data-ng-show="member.phone != ''"><span class="glyphicon glyphicon-phone-alt"></span> {{member.phone}}</button></td>
+                        </tr>
+                        
+                        
+                        <tr data-ng-show="member.email != ''">
+                            <td>Email</td>
+                            <td><button class="btn btn-sm btn-info" data-ng-click="email(member.email)" data-ng-show="member.email != ''"><span class="glyphicon glyphicon-send"></span> {{member.email}}</button></td>
+                        </tr>
+                        
+                        <tr data-ng-show="member.status != ''">
+                            <td>Status</td>
+                            <td>{{member.status}}</td>
+                        </tr>
+                    </table>
+                    <button data-ng-show="$storage.isManager == 'true'" class="btn btn-info btn-sm" data-ng-click="showEditMember(index)"><span class="glyphicon glyphicon-pencil"></span> Edit member details</button>
+                </div>
+                <form class="form-horizontal" role="form" name="editMemberForm" data-ng-show="editMemberPanel[index]">
+                    <div class="form-group col-xs-12">
+                        <label for="name" class="col-sm-2 control-label">Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="name" class="form-control" placeholder="E.g. Margaret Thrasher" data-ng-model="editMember.name" required /><br />
+                        </div>
+                    </div>
+                    <div class="form-group col-xs-12">
+                        <label for="role" class="col-sm-2 control-label">Role (Optional)</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="role" class="form-control" placeholder="E.g. Bass player" data-ng-model="editMember.role" /><br />
+                        </div>
+                    </div>
+                    <div class="form-group col-xs-12">
+                        <label for="phone" class="col-sm-2 control-label">Phone Number (Optional)</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="phone" class="form-control" placeholder="E.g. 503 420 6969" data-ng-model="editMember.phone" /><br />
+                        </div>
+                    </div>
+                    <div class="form-group col-xs-12" data-ng-show="notTheOwner[index]">
+                        <label for="email" class="col-sm-2 control-label">Email (Optional. User must use this email to access band data)</label>
+                        <div class="col-sm-10">
+                            <input type="email" name="email" class="form-control" placeholder="E.g. some@guy.com" data-ng-model="editMember.email" /><br />
+                        </div>
+                    </div>
+                    <div class="form-group col-xs-12" data-ng-show="notTheOwner[index]">
+                        <label for="status" class="col-sm-2 control-label">Status</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" data-ng-model="editMember.status" required>
+                                <option value="member">Regular Member</option>
+                                <option value="crew">Crew</option>
+                                <option value="manager">Manager</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-xs-12">
+                        <button type="button" class="btn btn-sm btn-info col-xs-offset-2 merchButton" data-ng-click="editMemberSave(index)"
+                                data-ng-class="{ disabled: editMemberForm.$error.required }" scroll-on-click>
+                            Save details
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger merchButton" data-ng-click="showEditMember(index)">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        
+
+    </div>
+    <div data-ng-class="homeScreenButtonClass" data-ng-show="$storage.isManager == 'true'">
+        <button class="btn btn-lg btn-info btn-block" data-ng-click="go('manageband')"><span class="glyphicon glyphicon-user"></span> Add new band member</button>
+    </div>
+</div>
