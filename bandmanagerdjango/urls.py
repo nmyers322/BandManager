@@ -43,6 +43,8 @@ urlpatterns = patterns('',
     url(r'^json/add_to_stock/(?P<band_id>\w+)$', views.json_add_to_stock, name='jsonAddToStock'),
     url(r'^json/change_price/(?P<band_id>\w+)$', views.json_change_price, name='jsonChangePrice'),
     url(r'^json/get_my_info$', views.json_get_my_info, name='jsonGetMyInfo'),
+    url(r'^json/add_suggestion/$', views.json_add_suggestion, name='jsonAddSuggestion'),
+    url(r'^thanks_for_suggestion$', views.thanks_for_suggestion, name='thanksForSuggestion'),
 
 )
 

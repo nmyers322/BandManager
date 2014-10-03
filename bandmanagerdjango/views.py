@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 from django.contrib.auth.models import User
-from models import Band, Member, Merch, MerchOption, Show, Schedule, Expense, Owed, Invitation
+from models import Band, Member, Merch, MerchOption, Show, Schedule, Expense, Owed, Invitation, Suggestion
 from django.core.context_processors import csrf
 from django.contrib.auth.forms import UserCreationForm
 from django.template import RequestContext, Context, loader
@@ -14,6 +14,7 @@ import json
 from django.core.mail import send_mail
 
 def index(request):
+    sug = Suggestion.objects.all()
     if request.user.is_authenticated():
         bandList = []
         invList = []
@@ -24,16 +25,20 @@ def index(request):
             if inv.active == True:
                 invList.append(inv.band)
         context = {
+            'success': '',
             'error': '',
             'show_sign_in': True,
             'bandList': bandList,
             'invList': invList,
-            'username': request.user.username
+            'username': request.user.username,
+            'suggestions': sug
             }
     else:
         context = {
+            'success': '',
             'error': '',
-            'show_sign_in': False
+            'show_sign_in': False,
+            'suggestions': sug
             }
     return render(request, 'index.html', context)
 
@@ -42,22 +47,26 @@ def index(request):
 def register_failure(request):
     error = "There was an error in your registration. Try again."
     showSignIn = False
+    sug = Suggestion.objects.all()
     if request.user.is_authenticated():
         showSignIn = True
     context = {
         'error': error,
-        'show_sign_in': showSignIn
+        'show_sign_in': showSignIn,
+        'suggesions': sug
         }
     return render(request, 'index.html', context)
 
 def login_failure(request):
     error = "There was a login error. Try again."
     showSignIn = False
+    sug = Suggestion.objects.all()
     if request.user.is_authenticated():
         showSignIn = True
     context = {
         'error': error,
-        'show_sign_in': showSignIn
+        'show_sign_in': showSignIn,
+        'suggesions': sug
         }
     return render(request, 'index.html', context)
 
@@ -684,3 +693,27 @@ def json_members(request, band_id):
         myBand = Band.objects.get(id=band_id)
         return HttpResponse(serializers.serialize("json", Member.objects.filter(band=myBand)))
     return HttpResponseRedirect('/')
+
+#add a suggestion on the main page
+def json_add_suggestion(request):
+    if request.method == "POST":
+        text = request.POST.get('addSuggestion', '(someone input invalid text)')
+        sug = Suggestion(text=text)
+        sug.save()
+        return HttpResponseRedirect('/thanks_for_suggestion')
+    return HttpResponse("failure")
+
+#show success msg
+def thanks_for_suggestion(request):
+    success = "Thanks for the suggestion!"
+    showSignIn = False
+    sug = Suggestion.objects.all()
+    if request.user.is_authenticated():
+        showSignIn = True
+    context = {
+        'error': '',
+        'show_sign_in': showSignIn,
+        'suggestions': sug,
+        'success': success
+        }
+    return render(request, 'index.html', context)

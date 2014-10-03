@@ -16,6 +16,9 @@ add show: delete time slots if added too many
 edit show
 integrate contacts library
 integrate venue library
+send EPK
+link datebook - public listing of shows
+travel time between gigs
 
 fixed/added:
 add Payment/"deposit"

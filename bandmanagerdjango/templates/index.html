@@ -72,6 +72,12 @@
             {{ error }}
         </div>
         {% endif %}
+
+        {% if success != "" %}
+        <div class="alert alert-info">
+            {{ success }}
+        </div>
+        {% endif %}
     
         <!--Content Goes Here-->
         {% if show_sign_in == False %}
@@ -173,8 +179,17 @@
     <div class="panel">
         <div class="panel panel-heading"><h2>Known Issues/Notes</h2></div>
         <div class="panel panel-body">
-            <p>This app is still in beta mode, and hasn't been extensively tested. There are still many known features that must be added and problems that must be fixed. Below is a list of the known issues.</p>
-            <p>shows "today view" isnt working, ability to kick out band member, merch: sell with square card reader, merch: success sell: option to give discount, user: forgot password/username, ability to change username, ability to change email, ability to change password, create "how to", fix drop down menu: close on outside click, finances: addedBy, delete band, no apple/iphone/mac/safari support, add show: delete time slots if added too many, edit show</p>
+            <p>This app is still in beta mode, and hasn't been extensively tested. There are still many known features that must be added and problems that must be fixed. Please note: I'm currently employed and will not be working on this app for the next 3-4 months. I hope to get back to it when I have some free time. In the meantime, you can leave me a suggestion. Below is a list of the known issues, and the form to add a suggestion.</p>
+            <p>shows "today view" isnt working, ability to kick out band member, merch: sell with square card reader, merch: success sell: option to give discount, user: forgot password/username, ability to change username, ability to change email, ability to change password, create "how to", fix drop down menu: close on outside click, finances: addedBy, delete band, no apple/iphone/mac/safari support, add show: delete time slots if added too many, edit show, integrate contacts library, integrate venue library, send EPK, link datebook - public listing of shows, travel time between gigs, 
+            {% for sug in suggestions %}
+                {{ sug.text }}, 
+            {% endfor %}
+            </p>
+            <form method="POST" action="/json/add_suggestion/" role="form" class="form-inline" id="addSuggestionForm">
+                {% csrf_token %}
+                <input type="text" id="addSuggestion" name="addSuggestion" placeholder="Add suggestion..." class="form-control">
+                <button class="btn btn-primary btn-sm" type="submit">Add suggestion</button>
+            </form>
         </div>
     </div>
         {% else %}
